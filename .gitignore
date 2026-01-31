@@ -1,0 +1,36 @@
+# --- DEPENDENCIES ---
+node_modules/
+/backend-api/node_modules/
+/frontend-user/node_modules/
+/frontend-admin/node_modules/
+
+# --- SECRETS ---
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- DOCKER DATA ---
+
+docker/db_data/
+
+# --- OS FILES ---
+.DS_Store
+Thumbs.db
+
+# --- BUILD FOLDERS ---
+
+/frontend-user/dist/
+/frontend-user/build/
+/frontend-admin/dist/
+/frontend-admin/build/
+
+# --- LOGS ---
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log

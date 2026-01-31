@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: "PFE-database"
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: user_pfe
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/1.sql
+
+  backend:
+    build:
+      context: ../backend-api
+      dockerfile: ../docker/backend.Dockerfile  # جرب هاد المسار النسبي الكامل
+    container_name: node_backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: user_pfe
+      DB_PASSWORD: user_password
+      DB_NAME: "PFE-database"
+
+volumes:
+  db_data:
