@@ -16,18 +16,21 @@ services:
 
   backend:
     build:
-      context: ../backend-api
-      dockerfile: ../docker/backend.Dockerfile  # جرب هاد المسار النسبي الكامل
+      context: ..
+      dockerfile: docker/backend.Dockerfile
     container_name: node_backend
     ports:
       - "5000:5000"
     depends_on:
       - db
+    env_file:
+      - ../backend-api/.env  
     environment:
       DB_HOST: db
       DB_USER: user_pfe
       DB_PASSWORD: user_password
       DB_NAME: "PFE-database"
+     
 
 volumes:
   db_data:

@@ -15,6 +15,6 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
-console.log('✅ MySQL Pool Created (Connecting to PFE-database...)');
+console.log(' MySQL Pool Created (Connecting to PFE-database...)');
 
 module.exports = promisePool;
