@@ -13,6 +13,7 @@ app.use(cors());
 
 // --- ROUTES ---
 app.use('/api/auth', authRoutes);
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 // 1. Test Route
 app.get('/', (req, res) => {
