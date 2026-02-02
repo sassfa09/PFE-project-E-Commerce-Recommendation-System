@@ -2,8 +2,19 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 
-// TODO: Create the GET route to fetch all products (/)
-// TODO: Create the GET route to fetch a single product by ID (/:id)
-// TODO: Create the POST route to add a new product (/add)
+
+// ==========================================================
+// Routes
+// ==========================================================
+
+// Get all products
+router.get('/', productController.getAllProducts);
+
+// Get single product by ID
+router.get('/:id', productController.getProductById);
+
+// Add new product
+router.post('/add', productController.addProduct);
+
 
 module.exports = router;
