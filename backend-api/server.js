@@ -4,6 +4,7 @@ const db = require('./config/db');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cors());
 // --- ROUTES ---
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/products', productRoutes);
 
 // 1. Test Route
 app.get('/', (req, res) => {
