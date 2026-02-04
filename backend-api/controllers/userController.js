@@ -1,53 +1,55 @@
-const db = require('../config/db');
+const User = require('../models/User');
 
+/**
+ * @desc    Get current user profile
+ * @route   GET /api/users/profile
+ * @access  Private
+ */
 exports.getProfile = async (req, res) => {
     try {
         const id_user = req.user.id_user;
 
-        const [rows] = await db.query(
-            `SELECT id_user, nom, email, telephone, adresse 
-             FROM client 
-             WHERE id_user = ?`,
-            [id_user]
-        );
+        // We use the model that already handles the SELECT
+        // and removes the password from the result
+        const user = await User.findById(id_user);
 
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "User not found" });
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        res.json(rows[0]);
+        res.status(200).json({ success: true, data: user });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error fetching profile" });
+        console.error("Profile Fetch Error:", error.message);
+        res.status(500).json({ message: "Erreur lors de la récupération du profil" });
     }
 };
 
-
-
+/**
+ * @desc    Update user profile
+ * @route   PUT /api/users/profile
+ * @access  Private
+ */
 exports.updateProfile = async (req, res) => {
     try {
         const id_user = req.user.id_user;
         const { nom, telephone, adresse } = req.body;
 
-        // Optional: check if at least one field is provided
+        // [Security Check] Make sure at least one field is provided
         if (!nom && !telephone && !adresse) {
-            return res.status(400).json({ message: "No data provided to update" });
+            return res.status(400).json({ message: "Aucune donnée fournie pour la mise à jour" });
         }
 
-        // Update query
-        await db.query(
-            `UPDATE client 
-             SET nom = ?, telephone = ?, adresse = ?
-             WHERE id_user = ?`,
-            [nom, telephone, adresse, id_user]
-        );
+        // Use the model to update the data
+        await User.update(id_user, { nom, telephone, adresse });
 
-        res.json({ message: "Profile updated successfully" });
+        res.status(200).json({ 
+            success: true, 
+            message: "Profil mis à jour avec succès" 
+        });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error updating profile" });
+        console.error("Profile Update Error:", error.message);
+        res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
     }
 };
-

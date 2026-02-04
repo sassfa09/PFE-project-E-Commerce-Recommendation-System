@@ -1,50 +1,97 @@
-const db = require('../config/db');
+const Product = require('../models/Product');
 
-// 1. Get All Products
+/**
+ * @desc    Get all products
+ * @route   GET /api/products
+ * @access  Public
+ */
 exports.getAllProducts = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM product');
-        res.json(rows);
+        const products = await Product.findAllActive();
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching products" });
+        console.error("Error fetching products:", error.message);
+        res.status(500).json({ message: "Erreur lors de la récupération des produits" });
     }
 };
 
-// 2. Get Product By ID
+/**
+ * @desc    Get single product by ID
+ * @route   GET /api/products/:id
+ * @access  Public
+ */
 exports.getProductById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const [rows] = await db.query('SELECT * FROM product WHERE id_product = ?', [id]);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Product not found" });
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: "Produit non trouvé" });
         }
-        res.json(rows[0]);
+        res.status(200).json({ success: true, data: product });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching product details" });
+        res.status(500).json({ message: "Erreur serveur" });
     }
 };
 
-// 3. Add Product 
-exports.addProduct = async (req, res) => {
+/**
+ * @desc    Create a product
+ * @route   POST /api/products
+ * @access  Private (Admin only)
+ */
+exports.createProduct = async (req, res) => {
     try {
-        
-        const { nom_produit, prix, stock, id_categorie } = req.body;
+        // [Security] الـ Data كتجينا من الـ Admin
+        const { designation, prix, stock, id_category, image_url } = req.body;
 
-        if (!nom_produit || !prix) {
-            return res.status(400).json({ message: "Name (nom_produit) and price (prix) are required" });
+        // التحقق من البيانات الأساسية
+        if (!designation || !prix || !id_category) {
+            return res.status(400).json({ message: "Veuillez remplir les champs obligatoires" });
         }
 
-        await db.query(
-            'INSERT INTO product (nom_produit, prix, stock, id_categorie) VALUES (?, ?, ?, ?)',
-            [nom_produit, prix, stock || 0, id_categorie || null]
-        );
+        const productId = await Product.create({
+            designation,
+            prix,
+            stock: stock || 0,
+            id_category,
+            image_url
+        });
 
-        res.status(201).json({ message: "Product added successfully" });
+        res.status(201).json({
+            success: true,
+            message: "Produit ajouté avec succès",
+            productId
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error adding product", error: error.message });
+        console.error("Error creating product:", error.message);
+        res.status(500).json({ message: "Erreur lors de l'ajout du produit" });
+    }
+};
+/**
+ * @desc    Get products by category
+ * @route   GET /api/products/category/:id
+ * @access  Public
+ */
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+
+       
+        if (isNaN(categoryId)) {
+            return res.status(400).json({ message: "ID de catégorie invalide" });
+        }
+
+        const products = await Product.findByCategory(categoryId);
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products
+        });
+    } catch (error) {
+        console.error("Error fetching products by category:", error.message);
+        res.status(500).json({ message: "Erreur serveur lors du filtrage" });
     }
 };

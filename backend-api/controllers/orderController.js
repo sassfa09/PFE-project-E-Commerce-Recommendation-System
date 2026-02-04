@@ -1,65 +1,62 @@
-const db = require('../config/db');
+const Order = require('../models/Order');
 
+/**
+ * @desc    Créer une nouvelle commande
+ * @route   POST /api/orders
+ * @access  Private (User)
+ */
 exports.createOrder = async (req, res) => {
-    const { montant_total, items } = req.body;
-    const id_user = req.user.id_user; 
-
-    if (!items || items.length === 0) {
-        return res.status(400).json({ message: "Your cart is empty" });
-    }
-
-    let connection; // Declare connection outside to use it in catch/finally
-
     try {
-        // Get a connection from the pool
-        connection = await db.getConnection();
+        const { items } = req.body;
+        const id_user = req.user.id_user; // جاية من الـ authMiddleware (JWT)
 
-        // Start Transaction
-        await connection.beginTransaction();
-
-        // 1. Insert into 'commande' table
-        const [orderResult] = await connection.query(
-            'INSERT INTO commande (id_user, montant_total, statut) VALUES (?, ?, ?)',
-            [id_user, montant_total, 'en_attente']
-        );
-
-        const id_commande = orderResult.insertId;
-
-        // 2. Insert items into 'Ligne_Commande'
-        for (const item of items) {
-            await connection.query(
-                'INSERT INTO Ligne_Commande (id_produit, id_commande, quantite, prix_unitaire) VALUES (?, ?, ?, ?)',
-                [item.id_produit, id_commande, item.quantite, item.prix_unitaire]
-            );
+        // 1. [Security] تأكد بلي السلة ماشي خاوية
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ 
+                message: "Votre panier est vide ou le format des données est incorrect." 
+            });
         }
 
-        // 3. Commit
-        await connection.commit();
+        // 2. [Security & Business Logic]
+        // كنعيطو لـ الموديل اللي فيه الـ Transaction. 
+        // الثمن (totalAmount) كيتحسب لداخل فـ السيرفر لضمان الأمان.
+        const orderId = await Order.createOrder(id_user, items);
 
+        // 3. جواب السيرفر في حالة النجاح
         res.status(201).json({ 
-            message: "Order placed successfully", 
-            orderId: id_commande 
+            success: true,
+            message: "Commande effectuée avec succès !", 
+            orderId: orderId 
         });
 
     } catch (error) {
-        // Rollback if something goes wrong
-        if (connection) await connection.rollback();
-        console.error("Order Transaction Error:", error);
-        res.status(500).json({ message: "Failed to place order" });
-    } finally {
-        // Release the connection back to the pool
-        if (connection) connection.release();
+        // [Security] كنطلعو الخطأ فـ الـ Console ديالنا ولكن ما كنصيفطوش تفاصيل الداتابيز لـ المستخدم
+        console.error("Erreur lors de la création de la commande:", error.message);
+        res.status(500).json({ 
+            message: "Une erreur est survenue lors du traitement de votre commande." 
+        });
     }
 };
 
+/**
+ * @desc    Récupérer l'historique des commandes de l'utilisateur
+ * @route   GET /api/orders/my-orders
+ * @access  Private (User)
+ */
 exports.getUserOrders = async (req, res) => {
     try {
-        const [orders] = await db.query(
-            'SELECT * FROM commande WHERE id_user = ? ORDER BY date_commande DESC',
-            [req.user.id_user]
-        );
-        res.json(orders);
+        const id_user = req.user.id_user;
+
+        // جلب الطلبيات باستعمال الموديل
+        const orders = await Order.findByUser(id_user);
+
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            data: orders
+        });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching orders" });
+        console.error("Erreur lors de la récupération des commandes:", error.message);
+        res.status(500).json({ message: "Erreur serveur." });
     }
 };

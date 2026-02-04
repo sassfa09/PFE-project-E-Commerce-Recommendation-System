@@ -1,20 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
+const authMiddleware = require('../middleware/authMiddleware'); 
+const adminMiddleware = require('../middleware/adminMiddleware'); // the middleware we created earlier
 
-
-// ==========================================================
-// Routes
-// ==========================================================
-
-// Get all products
+// Anyone can view products
 router.get('/', productController.getAllProducts);
-
-// Get single product by ID
 router.get('/:id', productController.getProductById);
+router.get('/category/:id', productController.getProductsByCategory);
 
-// Add new product
-router.post('/add', productController.addProduct);
-
+// Only Admin can add a product
+// We use two middlewares: first to check authentication, then to verify Admin role
+router.post('/', authMiddleware, adminMiddleware, productController.createProduct);
 
 module.exports = router;
