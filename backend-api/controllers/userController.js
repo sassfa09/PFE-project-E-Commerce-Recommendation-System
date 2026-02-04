@@ -1,23 +1,53 @@
 const db = require('../config/db');
 
-/**
- * TODO: Get the current logged-in user's profile.
- * 1. Get 'id_user' from 'req.user'.
- * 2. Execute SELECT on 'client' table.
- * 3. IMPORTANT: Do NOT return the 'mot_de_pass' field for security.
- */
 exports.getProfile = async (req, res) => {
     try {
-        // Write the SQL query to find user by id_user
+        const id_user = req.user.id_user;
+
+        const [rows] = await db.query(
+            `SELECT id_user, nom, email, telephone, adresse 
+             FROM client 
+             WHERE id_user = ?`,
+            [id_user]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(rows[0]);
+
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Server error fetching profile" });
     }
 };
 
-/**
- * TODO: Update user information (Optional/Bonus).
- * Update fields like 'nom', 'telephone', or 'adresse' in the 'client' table.
- */
+
+
 exports.updateProfile = async (req, res) => {
-    // Implement UPDATE logic here
+    try {
+        const id_user = req.user.id_user;
+        const { nom, telephone, adresse } = req.body;
+
+        // Optional: check if at least one field is provided
+        if (!nom && !telephone && !adresse) {
+            return res.status(400).json({ message: "No data provided to update" });
+        }
+
+        // Update query
+        await db.query(
+            `UPDATE client 
+             SET nom = ?, telephone = ?, adresse = ?
+             WHERE id_user = ?`,
+            [nom, telephone, adresse, id_user]
+        );
+
+        res.json({ message: "Profile updated successfully" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error updating profile" });
+    }
 };
+

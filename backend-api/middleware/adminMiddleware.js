@@ -1,14 +1,15 @@
-/**
- * TODO: Middleware to restrict access to Admins only.
- * 1. Check if the user object exists in 'req.user' (set by authMiddleware).
- * 2. Verify if 'req.user.role' is equal to 'admin'.
- * 3. If yes, call next().
- * 4. If no, return a 403 Forbidden status.
- */
 module.exports = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
-        next();
-    } else {
+    // User not logged in
+    if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized. Please login." });
+    }
+
+    // User logged in but not admin
+    if (req.user.role !== 'admin') {
         return res.status(403).json({ message: "Access denied. Admin rights required." });
     }
+
+    // User is admin → allow access
+    next();
 };
+
