@@ -4,6 +4,8 @@ const cors = require('cors');
 
 const app = express();
 
+
+
 // --- MIDDLEWARES ---
 app.use(cors()); // One time is enough
 app.use(express.json());

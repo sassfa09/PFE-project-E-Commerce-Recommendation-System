@@ -53,3 +53,12 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
     }
 };
+
+exports.getAllUsers = async (req, res) => {
+    try {
+    
+        res.status(200).json({ success: true, message: "Liste des utilisateurs" });
+    } catch (error) {
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+};
