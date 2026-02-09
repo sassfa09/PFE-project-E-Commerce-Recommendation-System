@@ -5,17 +5,27 @@ import App from './App.jsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext'; 
+// 1. Import PayPal Provider
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
+// 2. PayPal configuration (put your Client ID here)
+const paypalOptions = {
+  "client-id": "ARF9YiHmZqX1rLzPSsix5nwDlR1VshIMiPNhqwPgl7QmCTTdNJr9hLmvymZxD3uBd911DlBRsI36LdQl", // Get it from PayPal Developer Dashboard
+  currency: "USD", // Make sure the currency matches the one used in Cart
+  intent: "capture",
+};
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-  
-    <AuthProvider>
-      <CartProvider> 
-        <App />
-      </CartProvider>
-    </AuthProvider>
-    
-      </BrowserRouter>
+      <AuthProvider>
+        <CartProvider> 
+          {/* 3. Wrap the app with PayPal Provider */}
+          <PayPalScriptProvider options={paypalOptions}>
+            <App />
+          </PayPalScriptProvider>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 );

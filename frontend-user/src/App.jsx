@@ -7,7 +7,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
-import ProtectedRoute from "./components/ProtectedRoute"; // 1. استدعاء المحمي
+import ProtectedRoute from "./components/ProtectedRoute"; 
+import MyOrders from "./pages/MyOrders";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="cart" element={<Cart />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/my-orders" element={<MyOrders />} />
         </Route>
       </Route>
     </Routes>
