@@ -10,27 +10,30 @@ const AddCategory = () => {
     description: "",
   });
 
-  // تحديث القيم عند الكتابة
+  // Update values when typing
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // إرسال البيانات للباكيند
+  // Send data to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // كانديرو POST للباكيند (تأكد أن المسار هو /api/categories)
+      // Send POST request to backend (make sure the route is /api/categories)
       await API.post("/categories", formData);
       
-      alert("Catégorie ajoutée avec succès !");
+      alert("Category added successfully!");
       
-      // من بعد ما تزيد الكاتيغوري، نرجعو لصفحة المنتجات أو الداشبورد
+      // After adding the category, go back to dashboard or products page
       navigate("/dashboard"); 
     } catch (err) {
-      console.error("Erreur lors de l'ajout:", err);
-      alert(err.response?.data?.message || "Erreur lors de la création de la catégorie");
+      console.error("Error while adding:", err);
+      alert(
+        err.response?.data?.message || 
+        "Error while creating the category"
+      );
     } finally {
       setLoading(false);
     }
@@ -40,10 +43,10 @@ const AddCategory = () => {
     <div className="p-8 max-w-2xl mx-auto animate-fade-in">
       <div className="mb-8 text-center md:text-left">
         <h1 className="text-3xl font-black text-slate-blue tracking-tight">
-          Nouvelle Catégorie
+          New Category
         </h1>
         <p className="text-gray-500 mt-2">
-          Ajoutez une catégorie pour classer vos produits (ex: Sneakers, Accessoires).
+          Add a category to organize your products (e.g., Sneakers, Accessories).
         </p>
       </div>
 
@@ -51,17 +54,17 @@ const AddCategory = () => {
         onSubmit={handleSubmit} 
         className="bg-white p-8 rounded-3xl border border-platinum shadow-sm space-y-6"
       >
-        {/* Nom de la Catégorie */}
+        {/* Category Name */}
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-blue ml-1">
-            Nom de la Catégorie
+            Category Name
           </label>
           <input
             type="text"
             name="nom_categorie"
             value={formData.nom_categorie}
             onChange={handleChange}
-            placeholder="Ex: Chaussures de sport"
+            placeholder="Example: Sports Shoes"
             required
             className="w-full px-4 py-3 rounded-xl border border-platinum focus:border-pacific focus:ring-2 focus:ring-pacific/10 outline-none transition-all"
           />
@@ -70,14 +73,14 @@ const AddCategory = () => {
         {/* Description */}
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-blue ml-1">
-            Description (Détails)
+            Description (Details)
           </label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows="4"
-            placeholder="Décrivez brièvement les produits de cette catégorie..."
+            placeholder="Briefly describe the products in this category..."
             className="w-full px-4 py-3 rounded-xl border border-platinum focus:border-pacific focus:ring-2 focus:ring-pacific/10 outline-none transition-all resize-none"
           ></textarea>
         </div>
@@ -89,7 +92,7 @@ const AddCategory = () => {
             onClick={() => navigate(-1)}
             className="flex-1 py-4 bg-platinum text-slate-blue rounded-xl font-bold hover:bg-gray-200 transition-all"
           >
-            Annuler
+            Cancel
           </button>
           
           <button
@@ -99,10 +102,10 @@ const AddCategory = () => {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <i className="fa-solid fa-spinner animate-spin"></i> Enregistrement...
+                <i className="fa-solid fa-spinner animate-spin"></i> Saving...
               </span>
             ) : (
-              "Créer la catégorie"
+              "Create Category"
             )}
           </button>
         </div>
@@ -112,7 +115,7 @@ const AddCategory = () => {
       <div className="mt-8 p-4 bg-pacific/5 rounded-2xl border border-pacific/10">
         <p className="text-xs text-pacific font-medium leading-relaxed">
           <i className="fa-solid fa-lightbulb mr-2"></i>
-          Une fois la catégorie créée, vous pourrez l'utiliser lors de l'ajout d'un nouveau produit en utilisant son ID.
+          Once the category is created, you can use it when adding a new product by referencing its ID.
         </p>
       </div>
     </div>

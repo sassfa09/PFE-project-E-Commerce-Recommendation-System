@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
-  // الحالة ديال الفورم (State)
+ 
   const [formData, setFormData] = useState({
     name: "",
     email: "",

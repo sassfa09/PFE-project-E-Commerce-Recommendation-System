@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-[#326273] text-white pt-20 pb-10 mt-20 relative overflow-hidden">
-      {/* لمسة فنية: دائرة ملونة خفيفة في الخلفية */}
+   
       <div className="absolute top-0 right-0 w-64 h-64 bg-[#5C9EAD] opacity-5 rounded-full -mr-32 -mt-32"></div>
       
       <div className="container mx-auto px-6 relative z-10">

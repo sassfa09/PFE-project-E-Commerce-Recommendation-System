@@ -4,11 +4,11 @@ import { useCart } from "../context/CartContext";
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
 
-  // لوجيك باش نحددو رابط الصورة الصحيح
+
   const getImageUrl = (img) => {
     if (!img) return 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=400';
     
-    // إيلا كانت الصورة رابط خارجي (http) خليها، إيلا كانت مسار ملف زيد عليها رابط الباكيند
+ 
     if (img.startsWith('http')) {
       return img;
     }
@@ -22,7 +22,7 @@ const ProductCard = ({ product }) => {
       <div className="relative aspect-square overflow-hidden bg-[#F8F8F8]">
         <Link to={`/product/${product.id_product}`}>
           <img 
-            src={getImageUrl(product.img_url)} // استعملنا اللوجيك الجديد هنا
+            src={getImageUrl(product.img_url)} 
             alt={product.nom_produit}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Product&background=random"; }}

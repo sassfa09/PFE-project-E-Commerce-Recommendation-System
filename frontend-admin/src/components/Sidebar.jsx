@@ -3,13 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const location = useLocation();
-  
-  const menuItems = [
+ const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: "fa-chart-pie" },
-    { name: "Produits", path: "/products/manage", icon: "fa-box" },
-    { name: "Catégories", path: "/categories/manage", icon: "fa-layer-group" }, 
-    { name: "Commandes", path: "/orders/manage", icon: "fa-cart-shopping" },
-    { name: "Utilisateurs", path: "/users/manage", icon: "fa-users" },
+    { name: "Produits", path: "/products/manage", icon: "fa-box" }, 
+    { name: "Commandes", path: "/orders", icon: "fa-shopping-cart" }, 
+    { name: "Catégories", path: "/categories/manage", icon: "fa-list" },
   ];
 
   return (

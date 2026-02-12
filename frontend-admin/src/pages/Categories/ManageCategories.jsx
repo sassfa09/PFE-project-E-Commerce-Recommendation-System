@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API from "../../services/api"; // تأكد من مسار الـ API عندك
+import API from "../../services/api";
 
 const ManageCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. جلب البيانات من الباكيند
+  // 1. get data from DB
   const fetchCategories = async () => {
     try {
       const response = await API.get("/categories");
@@ -22,7 +22,7 @@ const ManageCategories = () => {
     fetchCategories();
   }, []);
 
-  // 2. دالة المسح (Delete)
+  // 2. Delete
   const handleDelete = async (id) => {
     if (window.confirm("Voulez-vous vraiment supprimer cette catégorie ?")) {
       try {

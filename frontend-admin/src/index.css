@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* --- 1. تعريف الألوان لـ Tailwind v4 --- */
+/* --- color --- */
 @theme {
   --color-pacific: #5C9EAD;
   --color-tangerine: #E39774;
@@ -8,14 +8,13 @@
   --color-platinum: #EEEEEE;
 }
 
-/* --- 2. الاستعمال --- */
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     @apply bg-[#F8F9FA] text-[#326273] antialiased;
   }
-} 
-/* --- التحسينات البصرية --- */
+}
 .product-shadow {
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }
@@ -24,7 +23,7 @@
   box-shadow: 0 20px 40px -10px rgba(92, 158, 173, 0.15);
 }
 
-/* ستايل الـ Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -36,7 +35,7 @@
   background: #5C9EAD;
 }
 
-/* أنيميشن الدخول */
+/*animetion */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

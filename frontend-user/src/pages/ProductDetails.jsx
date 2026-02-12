@@ -15,18 +15,18 @@ const ProductDetails = () => {
     const fetchFullData = async () => {
       try {
         setLoading(true);
-        // 1. جلب تفاصيل المنتج (تأكدي أن الباكاند كيرجع البيانات بـ id_product)
+        
         const res = await axios.get(`http://localhost:5000/api/products/${id}`);
         setProduct(res.data);
 
-        // 2. جلب توصيات من نفس الكاتيكوري (id_categorie)
-        // هادي هي الـ Logic ديال الـ Recommendation حالياً
+     
+        
         const recRes = await axios.get(`http://localhost:5000/api/products?id_categorie=${res.data.id_categorie}`);
         
-        // كنحيدو المنتج اللي كنشوفو فيه دابا من قائمة التوصيات
+       
         const filteredRecs = recRes.data
           .filter(p => p.id_product !== parseInt(id))
-          .slice(0, 4); // كنبينو غير 4
+          .slice(0, 4); 
         
         setRecommendations(filteredRecs);
         setLoading(false);
@@ -37,7 +37,7 @@ const ProductDetails = () => {
     };
 
     fetchFullData();
-    window.scrollTo(0, 0); // ديما نطلعو للفوق ملي يتبدل المنتج
+    window.scrollTo(0, 0); 
   }, [id]);
 
   if (loading) return (
@@ -90,7 +90,7 @@ const ProductDetails = () => {
 
               <div className="flex items-center gap-6 mb-8">
                 <span className="text-4xl font-black text-slate-blue">{product.prix} DH</span>
-                {/* تخفيض وهمي للجمالية */}
+            
                 <div className="flex flex-col">
                   <span className="text-gray-400 line-through text-sm">{(product.prix * 1.2).toFixed(2)} DH</span>
                   <span className="text-tangerine text-xs font-bold">Économisez 20%</span>

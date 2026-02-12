@@ -8,10 +8,10 @@ import { CartProvider } from './context/CartContext';
 // 1. Import PayPal Provider
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
-// 2. PayPal configuration (put your Client ID here)
+// 2. PayPal configuration 
 const paypalOptions = {
-  "client-id": "ARF9YiHmZqX1rLzPSsix5nwDlR1VshIMiPNhqwPgl7QmCTTdNJr9hLmvymZxD3uBd911DlBRsI36LdQl", // Get it from PayPal Developer Dashboard
-  currency: "USD", // Make sure the currency matches the one used in Cart
+  "client-id": "ARF9YiHmZqX1rLzPSsix5nwDlR1VshIMiPNhqwPgl7QmCTTdNJr9hLmvymZxD3uBd911DlBRsI36LdQl",
+  currency: "USD", 
   intent: "capture",
 };
 

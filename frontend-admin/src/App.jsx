@@ -7,6 +7,7 @@ import AddProduct from "./pages/Products/AddProduct";
 import ManageCategories from "./pages/Categories/ManageCategories";
 import AddCategory from "./pages/Categories/AddCategory";
 import EditProduct from "./pages/Products/EditProduct";
+import OrdersList from "./pages/OrdersList";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/products/edit/:id" element={<EditProduct />} />
                 <Route path="/categories/manage" element={<ManageCategories />} /> 
                 <Route path="/categories/add" element={<AddCategory />} />
+                <Route path="/orders" element={<OrdersList />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </Routes>
             </Layout>

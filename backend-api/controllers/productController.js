@@ -39,7 +39,7 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-// 3. Delete Product (هادي اللي كانت ناقصاك غالباً)
+// 3. Delete Product 
 exports.deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -50,7 +50,7 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
-// 4. Update Product (وضرورية حتى هي حيت عيطنا ليها فـ Routes)
+// 4. Update Product 
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -63,7 +63,7 @@ exports.updateProduct = async (req, res) => {
 
         if (req.file) {
             const image_url = `uploads/${req.file.filename}`;
-            // نمسحو التصويرة القديمة ونزيدو الجديدة أو نـUpdate-يها
+           
             await db.execute("DELETE FROM Product_Images WHERE prod_ID = ?", [id]);
             await db.execute("INSERT INTO Product_Images (prod_ID, img_url) VALUES (?, ?)", [id, image_url]);
         }

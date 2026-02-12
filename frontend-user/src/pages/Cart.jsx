@@ -31,7 +31,7 @@ const Cart = () => {
         type_paiement: type,
         paypal_order_id: paypalId,
         items: cartItems.map(item => ({
-          id_produit: item.id_product || item.id_produit, // Ensure compatibility with backend
+          id_produit: item.id_product || item.id_produit, 
           quantite: item.quantity,
           prix_unitaire: item.prix
         }))
@@ -136,7 +136,7 @@ const Cart = () => {
               <div className="relative z-10">
                 <PayPalButtons 
                   style={{ layout: "vertical", shape: "pill", label: "pay" }}
-                  // Re-render buttons when total changes to avoid NaN issues
+                  
                   forceReRender={[getSafeTotal()]} 
                   createOrder={(data, actions) => {
                     // Convert price to USD (roughly divide by 10)

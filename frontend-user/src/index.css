@@ -3,7 +3,6 @@
 
 @import "tailwindcss";
 
-/* --- 1. تعريف الألوان لـ Tailwind v4 --- */
 @theme {
   --color-pacific: #00AEEF;
   --color-tangerine: #FF8C00;
@@ -11,16 +10,16 @@
   --color-platinum: #EAEAEA;
 }
 
-/* --- 2. الاستعمال --- */
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    /* دابا Tailwind v4 غيقراها حيت زدناها فـ @theme الفوق */
+  
     @apply bg-[#F8FAFC] text-slate-blue antialiased;
   }
 }
 
-/* --- 3. باقي التأثيرات (خليهم كيف هما) --- */
+
 .product-shadow {
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }

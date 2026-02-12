@@ -13,9 +13,9 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          // According to userRoutes.js, the path is /users/profile
+         
           const res = await api.get("/users/profile");
-          setUser(res.data.data); // Because the backend returns { success: true, data: user }
+          setUser(res.data.data); 
         } catch (error) {
           console.error("Error fetching user:", error);
           localStorage.removeItem("token");
@@ -31,9 +31,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     try {
       const res = await api.post("/auth/register", {
-        nom: name,             // Match with backend
+        nom: name,             
         email: email,
-        mot_de_pass: password  // Match with backend
+        mot_de_pass: password  
       });
       
      
@@ -52,11 +52,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.post("/auth/login", {
         email: email,
-        mot_de_pass: password // Match with backend
+        mot_de_pass: password 
       });
 
       localStorage.setItem("token", res.data.token);
-      setUser(res.data.user); // Backend returns user: { id, nom, email }
+      setUser(res.data.user);
       return { success: true };
     } catch (error) {
       return {

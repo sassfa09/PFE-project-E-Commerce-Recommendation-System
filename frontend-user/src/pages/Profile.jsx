@@ -1,11 +1,28 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
+import api from "../services/api"; 
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartItems } = useCart();
+  const [orderCount, setOrderCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      try {
+        const res = await api.get("/orders/my-orders");
+        setOrderCount(res.data.length);
+      } catch (err) {
+        console.error("Erreur stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user) fetchUserStats();
+  }, [user]);
 
   return (
     <div className="bg-[#FBFCFC] min-h-screen py-12">
@@ -15,9 +32,8 @@ const Profile = () => {
           {/* Header Card */}
           <div className="bg-white rounded-[2rem] shadow-sm border border-[#EEEEEE] overflow-hidden">
             
-            {/* Banner Gradient - استعمال Palette الألوان */}
+            {/* Banner Gradient */}
             <div className="h-44 bg-gradient-to-r from-[#326273] via-[#5C9EAD] to-[#E39774] opacity-90 relative">
-               {/* زخرفة خفيفة في الخلفية */}
                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             </div>
             
@@ -38,7 +54,7 @@ const Profile = () => {
                       {user?.nom}
                     </h1>
                     <span className="bg-[#E39774]/10 text-[#E39774] text-[10px] font-black px-2 py-1 rounded-md uppercase">
-                      Client VIP
+                      {user?.role === 'admin' ? 'Administrateur' : 'Client Fidèle'}
                     </span>
                   </div>
                   <p className="text-gray-400 font-medium mt-1">
@@ -61,7 +77,7 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* Stat 1: Cart */}
-                <div className="bg-[#FBFCFC] p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#5C9EAD] transition-all group">
+                <Link to="/cart" className="bg-[#FBFCFC] p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#5C9EAD] transition-all group">
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Panier</span>
                     <i className="fa-solid fa-cart-shopping text-[#5C9EAD] opacity-20 group-hover:opacity-100 transition-opacity"></i>
@@ -70,28 +86,28 @@ const Profile = () => {
                     <span className="text-3xl font-black text-[#326273]">{cartItems.length}</span>
                     <span className="text-xs text-gray-400 font-bold uppercase">Articles</span>
                   </div>
-                </div>
+                </Link>
 
-                {/* Stat 2: Badge */}
-                <div className="bg-[#FBFCFC] p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#E39774] transition-all group">
+                {/* Stat 2: Orders Count */}
+                <Link to="/my-orders" className="bg-[#FBFCFC] p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#E39774] transition-all group">
                   <div className="flex justify-between items-start mb-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau</span>
-                    <i className="fa-solid fa-award text-[#E39774] opacity-20 group-hover:opacity-100 transition-opacity"></i>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Commandes</span>
+                    <i className="fa-solid fa-box-open text-[#E39774] opacity-20 group-hover:opacity-100 transition-opacity"></i>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xl font-black text-[#326273]">Membre Or</span>
-                    <span className="text-sm">✨</span>
+                    <span className="text-3xl font-black text-[#326273]">{orderCount}</span>
+                    <span className="text-xs text-gray-400 font-bold uppercase">Passées</span>
                   </div>
-                </div>
+                </Link>
 
-                {/* Stat 3: Points */}
+                {/* Stat 3: Loyalty Points (Logic Simple) */}
                 <div className="bg-[#FBFCFC] p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#326273] transition-all group">
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fidélité</span>
                     <i className="fa-solid fa-star text-[#326273] opacity-20 group-hover:opacity-100 transition-opacity"></i>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-[#326273]">1,250</span>
+                    <span className="text-3xl font-black text-[#326273]">{orderCount * 100}</span>
                     <span className="text-[10px] bg-[#326273]/10 text-[#326273] px-2 py-0.5 rounded font-black">PTS</span>
                   </div>
                 </div>
@@ -106,20 +122,35 @@ const Profile = () => {
                   </Link>
                 </div>
                 
-                <div className="bg-[#FBFCFC] rounded-3xl p-10 border-2 border-dashed border-[#EEEEEE] text-center">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <i className="fa-solid fa-ghost text-gray-200 text-2xl"></i>
+                {orderCount === 0 ? (
+                   <div className="bg-[#FBFCFC] rounded-3xl p-10 border-2 border-dashed border-[#EEEEEE] text-center">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                      <i className="fa-solid fa-ghost text-gray-200 text-2xl"></i>
+                    </div>
+                    <p className="text-gray-400 font-medium italic mb-6">
+                      Votre historique est encore tout frais !
+                    </p>
+                    <Link 
+                      to="/products"
+                      className="inline-flex items-center gap-2 bg-[#326273] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#5C9EAD] transition-all shadow-lg shadow-[#326273]/10"
+                    >
+                      Explorer la boutique
+                    </Link>
                   </div>
-                  <p className="text-gray-400 font-medium italic mb-6">
-                    Votre historique est encore tout frais !
-                  </p>
-                  <Link 
-                    to="/products"
-                    className="inline-flex items-center gap-2 bg-[#326273] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#5C9EAD] transition-all shadow-lg shadow-[#326273]/10"
-                  >
-                    Explorer la boutique
-                  </Link>
-                </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-[#EEEEEE] p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
+                        <i className="fa-solid fa-check text-xl"></i>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#326273]">Dernière commande effectuée</p>
+                        <p className="text-xs text-gray-400">Vérifiez le statut dans vos commandes.</p>
+                      </div>
+                    </div>
+                    <Link to="/my-orders" className="bg-[#EEEEEE] text-[#326273] px-4 py-2 rounded-lg text-xs font-bold">Détails</Link>
+                  </div>
+                )}
               </div>
 
             </div>

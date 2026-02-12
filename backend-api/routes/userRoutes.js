@@ -1,14 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware'); 
-const adminMiddleware = require('../middleware/adminMiddleware'); 
+// Correct Import
+const { auth, adminMiddleware } = require('../middleware/authMiddleware');
 
+// 1. User Profile Routes
 
-router.get('/profile', authMiddleware, userController.getProfile);
-router.put('/profile', authMiddleware, userController.updateProfile);
+router.get('/profile', auth, userController.getProfile);
+router.put('/profile', auth, userController.updateProfile);
 
+// 2. Admin Only Routes
 
-//router.get('/all-users', authMiddleware, adminMiddleware, userController.getAllUsers);
+router.get('/all-users', auth, adminMiddleware, userController.getAllUsers);
 
 module.exports = router;

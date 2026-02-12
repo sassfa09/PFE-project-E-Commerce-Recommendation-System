@@ -6,7 +6,7 @@ import axios from "axios";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AdminAuthContext); // كنخدمو بـ AdminAuth
+  const { login } = useContext(AdminAuthContext); 
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,18 +17,18 @@ const handleSubmit = async (e) => {
 
   try {
     const res = await axios.post("http://localhost:5000/api/auth/login", {
-      email: email,             // هادي صحيحة
-      mot_de_pass: password    // بدلها هنا! صيفط password اللي عندك فـ الـ state لـ mot_de_pass
+      email: email,             
+      mot_de_pass: password    
     });
 
     if (res.data.token) {
-      // 1. خزن التوكن
+      // 1. Save token 
       localStorage.setItem("adminToken", res.data.token);
       
-      // 2. تحديث الـ Context
+      // 2. update Context
       login(res.data.token); 
       
-      // 3. التوجه للـ Dashboard
+      // 3. move to Dashboard
       navigate("/dashboard");
     }
   } catch (err) {

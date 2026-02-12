@@ -3,24 +3,26 @@ import { createContext, useState, useEffect, useContext } from "react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // تحميل السلة من localStorage
+  // Load cart from localStorage
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // حفظ السلة في localStorage عند كل تغيير
+  // Save cart to localStorage on every change
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // 1. إضافة منتج للسلة
+  // 1. Add product to cart
   const addToCart = (product) => {
     setCartItems((prevItems) => {
-      // نضمنوا أن id_product كاين (سواء سميتيه id_produit أو id_product)
+     
       const productId = product.id_product || product.id_produit;
       
-      const isItemInCart = prevItems.find((item) => (item.id_product || item.id_produit) === productId);
+      const isItemInCart = prevItems.find(
+        (item) => (item.id_product || item.id_produit) === productId
+      );
 
       if (isItemInCart) {
         return prevItems.map((item) =>
@@ -29,62 +31,77 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-      // تأكدي أن السعر كيتحول لرقم فاش كيدخل للسلة أول مرة
-      const cleanPrice = typeof product.prix === "string" 
-        ? parseFloat(product.prix.replace(/[^\d.]/g, "")) 
-        : product.prix;
 
-      return [...prevItems, { ...product, id_product: productId, prix: cleanPrice, quantity: 1 }];
+      // Ensure price is converted to a number when first added to cart
+      const cleanPrice =
+        typeof product.prix === "string"
+          ? parseFloat(product.prix.replace(/[^\d.]/g, ""))
+          : product.prix;
+
+      return [
+        ...prevItems,
+        { ...product, id_product: productId, prix: cleanPrice, quantity: 1 }
+      ];
     });
   };
 
-  // 2. نقص الكمية أو حذف المنتج
+  // 2. Decrease quantity or remove product
   const removeFromCart = (productId) => {
     setCartItems((prevItems) =>
       prevItems.reduce((acc, item) => {
         const currentId = item.id_product || item.id_produit;
+
         if (currentId === productId) {
           if (item.quantity === 1) return acc;
           return [...acc, { ...item, quantity: item.quantity - 1 }];
         }
+
         return [...acc, item];
       }, [])
     );
   };
 
-  // 3. حذف المنتج بمرة واحدة
+  // 3. Delete product completely
   const deleteItem = (productId) => {
-    setCartItems((prevItems) => 
-      prevItems.filter((item) => (item.id_product || item.id_produit) !== productId)
+    setCartItems((prevItems) =>
+      prevItems.filter(
+        (item) => (item.id_product || item.id_produit) !== productId
+      )
     );
   };
 
-  // 4. حساب عدد المنتجات (Badge)
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  // 4. Calculate total item count 
+  const cartCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
-  // 5. حساب الثمن الإجمالي (مع التأكد من أن الحساب كيبقى رقم)
+  // 5. Calculate total price (ensuring result remains a number)
   const cartTotal = cartItems.reduce((total, item) => {
-    // تنظيف السعر من أي حروف زائدة تحسباً لأي غلط
-    const price = typeof item.prix === "string" 
-      ? parseFloat(item.prix.replace(/[^\d.]/g, "")) 
-      : item.prix;
-    
-    return total + (price * item.quantity);
+    // Clean price from any extra characters just in case
+    const price =
+      typeof item.prix === "string"
+        ? parseFloat(item.prix.replace(/[^\d.]/g, ""))
+        : item.prix;
+
+    return total + price * item.quantity;
   }, 0);
 
-  // 6. مسح السلة
+  // 6. Clear cart
   const clearCart = () => setCartItems([]);
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
-      addToCart, 
-      removeFromCart, 
-      deleteItem, 
-      cartCount, 
-      cartTotal, 
-      clearCart 
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        deleteItem,
+        cartCount,
+        cartTotal,
+        clearCart
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

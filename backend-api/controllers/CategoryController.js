@@ -1,6 +1,6 @@
-const db = require('../config/db'); // تأكد من مسار ملف الداتابيز عندك
+const db = require('../config/db'); 
 
-// --- 1. جلب جميع الأصناف (موجودة عندك) ---
+
 exports.getAllCategories = async (req, res) => {
     try {
         const [categories] = await db.query('SELECT * FROM categorie');
@@ -10,7 +10,7 @@ exports.getAllCategories = async (req, res) => {
     }
 };
 
-// --- 2. جلب صنف واحد (موجودة عندك) ---
+
 exports.getCategoryById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -22,13 +22,11 @@ exports.getCategoryById = async (req, res) => {
     }
 };
 
-// --- 3. إضافة صنف جديد (هادي هي اللي خاصاك باش يتحيد الـ 500) ---
 exports.createCategory = async (req, res) => {
     try {
         const { nom_categorie, description } = req.body;
         console.log("--- Payload reçu ---", req.body);
 
-        // استعملنا Backticks باش نهربو من مشاكل السمية ديال الجدول
         const [result] = await db.query(
             "INSERT INTO `categorie` (nom_categorie, description) VALUES (?, ?)", 
             [nom_categorie, description || null]
@@ -38,9 +36,9 @@ exports.createCategory = async (req, res) => {
         res.status(201).json({ message: "OK" });
 
     } catch (error) {
-        // هاد السطور هما اللي غيقولو لينا واش المشكل من Docker أو SQL
-        console.log("❌ ERROR TYPE:", error.code); 
-        console.log("❌ ERROR MESSAGE:", error.message);
+       
+        console.log(" ERROR TYPE:", error.code); 
+        console.log(" ERROR MESSAGE:", error.message);
         
         res.status(500).json({ 
             error: error.message,

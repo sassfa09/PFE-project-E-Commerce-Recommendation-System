@@ -24,9 +24,9 @@ API.interceptors.response.use(
     (response) => response, 
     (error) => {
         if (error.response && error.response.status === 401) {
-            // مسح توكن الآدمين فقط
+         
             localStorage.removeItem('adminToken');
-            // التوجه لصفحة لوجين الآدمين
+            
             window.location.href = '/login'; 
         }
         return Promise.reject(error);

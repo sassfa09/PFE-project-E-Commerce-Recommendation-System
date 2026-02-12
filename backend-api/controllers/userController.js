@@ -9,8 +9,7 @@ exports.getProfile = async (req, res) => {
     try {
         const id_user = req.user.id_user;
 
-        // We use the model that already handles the SELECT
-        // and removes the password from the result
+
         const user = await User.findById(id_user);
 
         if (!user) {

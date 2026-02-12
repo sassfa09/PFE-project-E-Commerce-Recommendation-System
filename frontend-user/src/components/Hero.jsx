@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 const Hero = () => {
   return (
     <section className="relative container mx-auto px-4 md:px-6 py-10">
-      {/* Main Container - استعملنا Blue Slate (#326273) */}
+    
       <div className="relative overflow-hidden rounded-[3rem] bg-[#326273] min-h-[550px] flex items-center shadow-2xl shadow-[#326273]/20">
         
         {/* Background Decorative Elements */}
-        {/* استعملنا Pacific Blue (#5C9EAD) فالتدرج الخلفي */}
+        
         <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#5C9EAD]/20 to-transparent z-0"></div>
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#E39774]/10 rounded-full blur-[100px] z-0"></div>
 
