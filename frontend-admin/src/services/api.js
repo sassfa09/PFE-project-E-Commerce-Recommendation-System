@@ -1,15 +1,16 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api', // Make sure this matches your backend port
+    baseURL: 'http://localhost:5000/api', 
     headers: {
         'Content-Type': 'application/json'
     }
 });
 
-// 1. Request Interceptor: adds the token before the request is sent
+// 1. Request Interceptor
 API.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+   
+    const token = localStorage.getItem('adminToken'); 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,15 +19,15 @@ API.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// 2. Response Interceptor: checks if there is an issue in the response
+// 2. Response Interceptor
 API.interceptors.response.use(
     (response) => response, 
     (error) => {
-        // If the server returns 401 (token is no longer valid)
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login'; // Redirect to login again
+            // مسح توكن الآدمين فقط
+            localStorage.removeItem('adminToken');
+            // التوجه لصفحة لوجين الآدمين
+            window.location.href = '/login'; 
         }
         return Promise.reject(error);
     }

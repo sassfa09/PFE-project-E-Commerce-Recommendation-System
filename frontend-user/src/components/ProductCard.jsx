@@ -4,6 +4,17 @@ import { useCart } from "../context/CartContext";
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
 
+  // لوجيك باش نحددو رابط الصورة الصحيح
+  const getImageUrl = (img) => {
+    if (!img) return 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=400';
+    
+    // إيلا كانت الصورة رابط خارجي (http) خليها، إيلا كانت مسار ملف زيد عليها رابط الباكيند
+    if (img.startsWith('http')) {
+      return img;
+    }
+    return `http://localhost:5000/${img}`;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
       
@@ -11,12 +22,13 @@ const ProductCard = ({ product }) => {
       <div className="relative aspect-square overflow-hidden bg-[#F8F8F8]">
         <Link to={`/product/${product.id_product}`}>
           <img 
-            src={product.image_url || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=400'} 
+            src={getImageUrl(product.img_url)} // استعملنا اللوجيك الجديد هنا
             alt={product.nom_produit}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Product&background=random"; }}
           />
         </Link>
-        {/* Discount Badge (Optional) */}
+        
         <div className="absolute top-3 left-3 bg-tangerine text-white text-[10px] font-black px-2 py-1 rounded-md shadow-sm">
           -15%
         </div>
@@ -37,16 +49,20 @@ const ProductCard = ({ product }) => {
         {/* Price & Action */}
         <div className="flex justify-between items-center mt-4">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-400 line-through">{(product.prix * 1.15).toFixed(2)} DH</span>
-            <span className="text-lg font-black text-slate-blue">{product.prix} DH</span>
+            <span className="text-xs text-gray-400 line-through">
+              {(parseFloat(product.prix) * 1.15).toFixed(2)} DH
+            </span>
+            <span className="text-lg font-black text-slate-blue">
+              {product.prix} DH
+            </span>
           </div>
           
           <button 
-  onClick={() => addToCart(product)} 
-  className="bg-gray-50 text-slate-blue p-3 rounded-xl hover:bg-pacific hover:text-white transition-all group shadow-sm"
->
-  <i className="fa-solid fa-cart-plus text-lg group-hover:scale-110 transition-transform"></i>
-</button>
+            onClick={() => addToCart(product)} 
+            className="bg-gray-50 text-slate-blue p-3 rounded-xl hover:bg-pacific hover:text-white transition-all group shadow-sm"
+          >
+            <i className="fa-solid fa-cart-plus text-lg group-hover:scale-110 transition-transform"></i>
+          </button>
         </div>
       </div>
     </div>

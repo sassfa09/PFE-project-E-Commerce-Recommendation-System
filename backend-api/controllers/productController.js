@@ -1,97 +1,96 @@
-const Product = require('../models/Product');
+const db = require('../config/db');
 
-/**
- * @desc    Get all products
- * @route   GET /api/products
- * @access  Public
- */
+// 1. Get All Products
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.findAllActive();
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products
-        });
+        const query = `
+            SELECT p.*, pi.img_url 
+            FROM product p
+            LEFT JOIN Product_Images pi ON p.id_product = pi.prod_ID
+            ORDER BY p.id_product DESC
+        `;
+        const [products] = await db.execute(query);
+        res.status(200).json({ success: true, data: products });
     } catch (error) {
-        console.error("Error fetching products:", error.message);
-        res.status(500).json({ message: "Erreur lors de la récupération des produits" });
+        res.status(500).json({ message: error.message });
     }
 };
 
-/**
- * @desc    Get single product by ID
- * @route   GET /api/products/:id
- * @access  Public
- */
-exports.getProductById = async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: "Produit non trouvé" });
-        }
-        res.status(200).json({ success: true, data: product });
-    } catch (error) {
-        res.status(500).json({ message: "Erreur serveur" });
-    }
-};
-
-/**
- * @desc    Create a product
- * @route   POST /api/products
- * @access  Private (Admin only)
- */
+// 2. Create Product
 exports.createProduct = async (req, res) => {
     try {
-        // [Security] الـ Data كتجينا من الـ Admin
-        const { designation, prix, stock, id_category, image_url } = req.body;
+        const { nom_produit, id_categorie, prix, stock } = req.body;
+        const image_url = req.file ? `uploads/${req.file.filename}` : null;
 
-        // التحقق من البيانات الأساسية
-        if (!designation || !prix || !id_category) {
-            return res.status(400).json({ message: "Veuillez remplir les champs obligatoires" });
+        const [result] = await db.execute(
+            "INSERT INTO product (id_categorie, nom_produit, prix, stock) VALUES (?, ?, ?, ?)",
+            [id_categorie, nom_produit, prix, stock]
+        );
+
+        if (image_url) {
+            await db.execute(
+                "INSERT INTO Product_Images (prod_ID, img_url) VALUES (?, ?)",
+                [result.insertId, image_url]
+            );
         }
-
-        const productId = await Product.create({
-            designation,
-            prix,
-            stock: stock || 0,
-            id_category,
-            image_url
-        });
-
-        res.status(201).json({
-            success: true,
-            message: "Produit ajouté avec succès",
-            productId
-        });
+        res.status(201).json({ success: true, message: "Produit créé !" });
     } catch (error) {
-        console.error("Error creating product:", error.message);
-        res.status(500).json({ message: "Erreur lors de l'ajout du produit" });
+        res.status(500).json({ message: error.message });
     }
 };
-/**
- * @desc    Get products by category
- * @route   GET /api/products/category/:id
- * @access  Public
- */
-exports.getProductsByCategory = async (req, res) => {
-    try {
-        const categoryId = req.params.id;
 
-       
-        if (isNaN(categoryId)) {
-            return res.status(400).json({ message: "ID de catégorie invalide" });
+// 3. Delete Product (هادي اللي كانت ناقصاك غالباً)
+exports.deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.execute("DELETE FROM product WHERE id_product = ?", [id]);
+        res.status(200).json({ success: true, message: "Produit supprimé !" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// 4. Update Product (وضرورية حتى هي حيت عيطنا ليها فـ Routes)
+exports.updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nom_produit, id_categorie, prix, stock } = req.body;
+
+        await db.execute(
+            "UPDATE product SET nom_produit=?, id_categorie=?, prix=?, stock=? WHERE id_product=?",
+            [nom_produit, id_categorie, prix, stock, id]
+        );
+
+        if (req.file) {
+            const image_url = `uploads/${req.file.filename}`;
+            // نمسحو التصويرة القديمة ونزيدو الجديدة أو نـUpdate-يها
+            await db.execute("DELETE FROM Product_Images WHERE prod_ID = ?", [id]);
+            await db.execute("INSERT INTO Product_Images (prod_ID, img_url) VALUES (?, ?)", [id, image_url]);
         }
 
-        const products = await Product.findByCategory(categoryId);
-
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products
-        });
+        res.status(200).json({ success: true, message: "Produit modifié !" });
     } catch (error) {
-        console.error("Error fetching products by category:", error.message);
-        res.status(500).json({ message: "Erreur serveur lors du filtrage" });
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// 5. Get Product By ID
+exports.getProductById = async (req, res) => {
+    try {
+        const [products] = await db.execute("SELECT * FROM product WHERE id_product = ?", [req.params.id]);
+        if (products.length === 0) return res.status(404).json({ message: "Non trouvé" });
+        res.json({ success: true, data: products[0] });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// 6. Get Products By Category
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const [products] = await db.execute("SELECT * FROM product WHERE id_categorie = ?", [req.params.id]);
+        res.json({ success: true, data: products });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };

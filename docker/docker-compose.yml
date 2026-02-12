@@ -30,6 +30,10 @@ services:
       DB_USER: user_pfe
       DB_PASSWORD: user_password
       DB_NAME: "PFE-database"
+    volumes:
+      - ../backend-api:/app      
+      - /app/node_modules      
+      - ../backend-api/uploads:/app/uploads  
      
 
 volumes:
