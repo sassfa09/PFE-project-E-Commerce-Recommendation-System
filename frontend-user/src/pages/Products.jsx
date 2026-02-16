@@ -6,6 +6,7 @@ import ProductCard from "../components/ProductCard";
 const Products = () => {
   const location = useLocation();
   const [products, setProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]); 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -14,21 +15,31 @@ const Products = () => {
   const [priceRange, setPriceRange] = useState(20000);
   const [minRating, setMinRating] = useState(0);
 
+
   useEffect(() => {
-    const fetchAllProducts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get("/products");
-        const data = res.data.data || res.data;
-        setProducts(Array.isArray(data) ? data : []);
+        setLoading(true);
+        const [resProducts, resCats] = await Promise.all([
+          api.get("/products"),
+          api.get("/categories")
+        ]);
+
+        const pData = resProducts.data.data || resProducts.data;
+        const cData = resCats.data.data || resCats.data;
+
+        setProducts(Array.isArray(pData) ? pData : []);
+        setDbCategories(Array.isArray(cData) ? cData : []);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchAllProducts();
+    fetchData();
   }, []);
 
+ 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const searchFromUrl = queryParams.get("search");
@@ -38,26 +49,31 @@ const Products = () => {
     if (catFromUrl !== null) setSelectedCategory(catFromUrl);
   }, [location.search]);
 
+
   useEffect(() => {
     let result = products;
 
+ 
     if (searchTerm) {
       result = result.filter((p) =>
         p.nom_produit && p.nom_produit.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
+   
     if (selectedCategory !== "All") {
       result = result.filter((p) => 
-        p.category === selectedCategory || String(p.id_categorie) === selectedCategory
+        p.nom_categorie === selectedCategory || String(p.id_categorie) === selectedCategory
       );
     }
 
+ 
     result = result.filter((p) => {
         const pPrice = Number(p.prix) || 0;
         return pPrice <= priceRange;
     });
 
+   
     if (minRating > 0) {
       result = result.filter((p) => (p.rating || 0) >= minRating);
     }
@@ -65,14 +81,12 @@ const Products = () => {
     setFilteredProducts(result);
   }, [searchTerm, selectedCategory, priceRange, minRating, products]);
 
-  const categories = ["All", ...new Set(products.map((p) => p.category).filter(Boolean))];
-
   return (
     <div className="bg-[#FBFCFC] min-h-screen">
       <div className="container mx-auto px-4 md:px-6 py-10 flex flex-col md:flex-row gap-10">
         
         {/* --- Sidebar Filter --- */}
-        <aside className="w-full md:w-72 flex-shrink-0 space-y-10">
+        <aside className="w-full md:w-72 flex-shrink-0 space-y-10 text-left">
           
           {/* Category Section */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#EEEEEE]">
@@ -80,22 +94,42 @@ const Products = () => {
               Catégories
             </h3>
             <div className="flex flex-col gap-4">
-              {categories.map((cat) => (
-                <label key={cat} className="flex items-center justify-between cursor-pointer group">
+              {/* Toutes */}
+              <label className="flex items-center justify-between cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="category"
+                    className="w-4 h-4 accent-[#5C9EAD] cursor-pointer"
+                    checked={selectedCategory === "All"}
+                    onChange={() => setSelectedCategory("All")}
+                  />
+                  <span className={`text-sm transition-colors ${selectedCategory === "All" ? 'font-bold text-[#326273]' : 'text-gray-500 group-hover:text-[#5C9EAD]'}`}>
+                    Toutes les catégories
+                  </span>
+                </div>
+                <span className="text-[10px] bg-[#EEEEEE] px-2 py-0.5 rounded-full text-gray-400">
+                  {products.length}
+                </span>
+              </label>
+
+             
+              {dbCategories.map((cat) => (
+                <label key={cat.id_categorie} className="flex items-center justify-between cursor-pointer group">
                   <div className="flex items-center gap-3">
                     <input
                       type="radio"
                       name="category"
                       className="w-4 h-4 accent-[#5C9EAD] cursor-pointer"
-                      checked={selectedCategory === cat}
-                      onChange={() => setSelectedCategory(cat)}
+                      checked={selectedCategory === cat.nom_categorie}
+                      onChange={() => setSelectedCategory(cat.nom_categorie)}
                     />
-                    <span className={`text-sm transition-colors ${selectedCategory === cat ? 'font-bold text-[#326273]' : 'text-gray-500 group-hover:text-[#5C9EAD]'}`}>
-                      {cat}
+                    <span className={`text-sm transition-colors ${selectedCategory === cat.nom_categorie ? 'font-bold text-[#326273]' : 'text-gray-500 group-hover:text-[#5C9EAD]'}`}>
+                      {cat.nom_categorie}
                     </span>
                   </div>
-                  <span className="text-[10px] bg-[#EEEEEE] px-2 py-0.5 rounded-full text-gray-400 group-hover:bg-[#5C9EAD]/10 transition-colors">
-                    {cat === "All" ? products.length : products.filter(p => p.category === cat).length}
+                  <span className="text-[10px] bg-[#EEEEEE] px-2 py-0.5 rounded-full text-gray-400">
+                    {products.filter(p => p.nom_categorie === cat.nom_categorie).length}
                   </span>
                 </label>
               ))}
@@ -142,7 +176,7 @@ const Products = () => {
               {minRating > 0 && (
                 <button 
                   onClick={() => setMinRating(0)}
-                  className="ml-auto text-[10px] font-bold text-gray-400 hover:text-red-400 uppercase tracking-tighter"
+                  className="ml-auto text-[10px] font-bold text-gray-400 hover:text-red-400"
                 >
                   Effacer
                 </button>
@@ -153,9 +187,9 @@ const Products = () => {
 
         {/* --- Main Content Area --- */}
         <main className="flex-1">
-          {/* Header & Search Summary */}
+          {/* Header */}
           <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
+            <div className="text-left">
               <h1 className="text-2xl font-black text-[#326273]">Boutique</h1>
               <p className="text-sm text-gray-400 mt-1">
                 {filteredProducts.length} produits trouvés
@@ -170,7 +204,7 @@ const Products = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">
                 <i className="fa-solid fa-magnifying-glass"></i>
               </span>
             </div>
@@ -195,12 +229,12 @@ const Products = () => {
                 <i className="fa-solid fa-box-open text-3xl text-gray-300"></i>
               </div>
               <h3 className="text-xl font-bold text-[#326273] mb-2">Aucun produit trouvé</h3>
-              <p className="text-gray-400 mb-8 max-w-xs mx-auto">Nous n'avons trouvé aucun résultat pour vos filtres actuels.</p>
+              <p className="text-gray-400 mb-8 max-w-xs mx-auto">Vérifiez vos filtres ou essayez un autre mot-clé.</p>
               <button 
                 onClick={() => {setSelectedCategory("All"); setPriceRange(20000); setSearchTerm(""); setMinRating(0);}}
-                className="px-8 py-3 bg-[#326273] text-white font-bold rounded-xl hover:bg-[#5C9EAD] transition-all shadow-lg shadow-[#326273]/20 active:scale-95"
+                className="px-8 py-3 bg-[#326273] text-white font-bold rounded-xl hover:bg-[#5C9EAD] transition-all"
               >
-                Réinitialiser les filtres
+                Réinitialiser
               </button>
             </div>
           )}

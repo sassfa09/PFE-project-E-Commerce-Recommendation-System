@@ -17,22 +17,22 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-      
-      {/* Image Section */}
-      <div className="relative aspect-square overflow-hidden bg-[#F8F8F8]">
-        <Link to={`/product/${product.id_product}`}>
-          <img 
-            src={getImageUrl(product.img_url)} 
-            alt={product.nom_produit}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Product&background=random"; }}
-          />
-        </Link>
-        
-        <div className="absolute top-3 left-3 bg-tangerine text-white text-[10px] font-black px-2 py-1 rounded-md shadow-sm">
-          -15%
-        </div>
-      </div>
+   {/* Image Section */}
+<div className="relative aspect-square overflow-hidden bg-[#F8F8F8]">
+  <Link to={`/product/${product.id_product}`}>
+    <img 
+    
+      src={getImageUrl(product.img_url)} 
+      alt={product.nom_produit} 
+      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+      onError={(e) => { e.target.src = 'https://via.placeholder.com/400'; }} 
+    />
+  </Link>
+  
+  <div className="absolute top-3 left-3 bg-tangerine text-white text-[10px] font-black px-2 py-1 rounded-md shadow-sm">
+    -15%
+  </div>
+</div>
 
       {/* Content Section */}
       <div className="p-4">

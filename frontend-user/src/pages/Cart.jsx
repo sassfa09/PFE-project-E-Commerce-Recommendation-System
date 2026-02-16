@@ -75,7 +75,12 @@ const Cart = () => {
         <div className="lg:col-span-2 space-y-6">
           {cartItems.map((item) => (
             <div key={item.id_product || item.id_produit} className="flex items-center gap-6 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <img src={item.image_url} alt={item.nom_produit} className="w-24 h-24 object-cover rounded-2xl bg-gray-50" />
+              <img 
+  src={item.img_url ? `http://localhost:5000/${item.img_url}` : "https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=200"} 
+  alt={item.nom_produit} 
+  className="w-24 h-24 object-cover rounded-2xl bg-gray-50" 
+  onError={(e) => { e.target.src = "https://via.placeholder.com/200"; }}
+/>
               <div className="flex-1">
                 <h3 className="font-bold text-slate-blue text-lg">{item.nom_produit}</h3>
                 <p className="text-pacific font-black">{item.prix} DH</p>
