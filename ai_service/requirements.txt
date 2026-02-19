@@ -1,0 +1,6 @@
+flask
+pandas
+scikit-learn
+mysql-connector-python
+flask-cors
+python-dotenv

@@ -25,13 +25,13 @@ CREATE TABLE IF NOT EXISTS product (
     id_product INT AUTO_INCREMENT PRIMARY KEY,
     id_categorie INT,
     nom_produit VARCHAR(255) NOT NULL,
+    description TEXT, 
     prix DECIMAL(10, 2) NOT NULL,
     stock INT DEFAULT 0,
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_product_categorie FOREIGN KEY (id_categorie) 
         REFERENCES categorie(id_categorie) ON DELETE SET NULL
 );
-
 -- 5. Table: Product_Images
 CREATE TABLE IF NOT EXISTS Product_Images (
     prod_img_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -93,8 +93,9 @@ CREATE TABLE IF NOT EXISTS recommandation (
     id_recommandation INT AUTO_INCREMENT PRIMARY KEY,
     id_utilisateur INT,
     id_produit INT,
-    type VARCHAR(50), '
-    score DECIMAL(5, 2),    CONSTRAINT fk_rec_client FOREIGN KEY (id_utilisateur) 
+    type VARCHAR(50), 
+    score DECIMAL(5, 2),    
+    CONSTRAINT fk_rec_client FOREIGN KEY (id_utilisateur) 
         REFERENCES client(id_user) ON DELETE CASCADE,
     CONSTRAINT fk_rec_product FOREIGN KEY (id_produit) 
         REFERENCES product(id_product) ON DELETE CASCADE

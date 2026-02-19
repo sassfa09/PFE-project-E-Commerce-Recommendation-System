@@ -3,17 +3,18 @@ import API from "../../services/api";
 
 const AddProduct = () => {
   const [categories, setCategories] = useState([]);
-  const [imageType, setImageType] = useState("url"); // 'url' أو 'file'
+  const [imageType, setImageType] = useState("url"); 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nom_produit: "",
     id_categorie: "",
     prix: "",
     stock: "",
+    description: "", 
     imageData: "" 
   });
 
-  // 1. جلب الكاتيغوريات باش نعمرو الـ Dropdown
+
   useEffect(() => {
     const fetchCats = async () => {
       try {
@@ -38,7 +39,6 @@ const AddProduct = () => {
     e.preventDefault();
     setLoading(true);
 
-    // جلب التوكن بـ السمية اللي سيفنا فـ الـ Login
     const token = localStorage.getItem("adminToken");
 
     if (!token) {
@@ -47,30 +47,38 @@ const AddProduct = () => {
       return;
     }
 
-    // استعمال FormData لإرسال الملفات والبيانات
+   
     const data = new FormData();
     data.append("nom_produit", formData.nom_produit);
     data.append("id_categorie", formData.id_categorie);
     data.append("prix", formData.prix);
     data.append("stock", formData.stock);
+    data.append("description", formData.description); 
     
     if (imageType === "url") {
-      data.append("image_url", formData.imageData);
+      data.append("image_url", formData.imageData); 
     } else {
-      data.append("image_file", formData.imageData); // هادا هو req.file فـ الباكيند
+      data.append("image_file", formData.imageData); 
     }
 
     try {
-      const response = await API.post("/products", data, {
+      await API.post("/products", data, {
         headers: { 
           "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${token}` // صيفطنا التوكن باش الـ Middleware تقبلنا
+          "Authorization": `Bearer ${token}` 
         }
       });
 
-      alert(" Produit ajouté avec succès !");
-      // مسح الفورم بعد النجاح
-      setFormData({ nom_produit: "", id_categorie: "", prix: "", stock: "", imageData: "" });
+      alert("Produit ajouté avec succès !");
+     
+      setFormData({ 
+        nom_produit: "", 
+        id_categorie: "", 
+        prix: "", 
+        stock: "", 
+        description: "", 
+        imageData: "" 
+      });
     } catch (err) {
       console.error("Détails de l'erreur:", err.response?.data);
       alert(err.response?.data?.message || "Erreur lors de l'ajout");
@@ -80,7 +88,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto animate-fade-in">
+    <div className="p-8 max-w-4xl mx-auto animate-fade-in text-left">
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 bg-pacific/10 rounded-2xl flex items-center justify-center text-pacific text-2xl">
           <i className="fa-solid fa-box-open"></i>
@@ -100,8 +108,17 @@ const AddProduct = () => {
           />
         </div>
 
+        {/* Description  */}
+        <div>
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Description (Important pour l'AI)</label>
+          <textarea 
+            name="description" value={formData.description} onChange={handleChange}
+            className="w-full p-4 bg-slate-50 border border-platinum rounded-2xl focus:ring-4 focus:ring-pacific/5 focus:border-pacific outline-none transition-all h-32 resize-none"
+            placeholder="Décrivez le produit (couleur, matière, style...)" required
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Dropdown Catégories */}
           <div>
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Catégorie</label>
             <select 
@@ -110,14 +127,11 @@ const AddProduct = () => {
             >
               <option value="">Choisir une catégorie</option>
               {categories.map(cat => (
-                <option key={cat.id_categorie} value={cat.id_categorie}>
-                  {cat.nom_categorie}
-                </option>
+                <option key={cat.id_categorie} value={cat.id_categorie}>{cat.nom_categorie}</option>
               ))}
             </select>
           </div>
 
-          {/* Prix */}
           <div>
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Prix (DH)</label>
             <input 
@@ -129,8 +143,8 @@ const AddProduct = () => {
         </div>
 
         {/* Section Image */}
-        <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-dashed border-platinum">
-          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-4 ml-1 text-center">Image du produit</label>
+        <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-dashed border-platinum text-center">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Image du produit</label>
           <div className="flex justify-center gap-4 mb-6">
             <button 
               type="button" 
@@ -155,17 +169,14 @@ const AddProduct = () => {
               placeholder="https://example.com/image.jpg"
             />
           ) : (
-            <div className="relative group">
-               <input 
-                type="file" onChange={handleFileChange}
-                className="w-full p-4 bg-white border border-platinum rounded-2xl outline-none cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pacific/10 file:text-pacific hover:file:bg-pacific/20"
-                accept="image/*"
-              />
-            </div>
+            <input 
+              type="file" onChange={handleFileChange}
+              className="w-full p-4 bg-white border border-platinum rounded-2xl outline-none cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-pacific/10 file:text-pacific"
+              accept="image/*"
+            />
           )}
         </div>
 
-        {/* Stock */}
         <div>
           <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Quantité disponible</label>
           <input 
@@ -176,9 +187,8 @@ const AddProduct = () => {
         </div>
 
         <button 
-          type="submit" 
-          disabled={loading}
-          className="w-full bg-slate-blue text-white py-5 rounded-[1.5rem] font-black text-lg hover:bg-pacific transition-all shadow-xl shadow-slate-blue/20 flex items-center justify-center gap-3 active:scale-[0.98]"
+          type="submit" disabled={loading}
+          className="w-full bg-slate-blue text-white py-5 rounded-[1.5rem] font-black text-lg hover:bg-pacific transition-all shadow-xl flex items-center justify-center gap-3 active:scale-[0.98]"
         >
           {loading ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-cloud-arrow-up"></i>}
           {loading ? "Enregistrement..." : "Enregistrer le produit"}

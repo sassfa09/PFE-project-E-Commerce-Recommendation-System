@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # 1. MySQL
   db:
     image: mysql:8.0
     container_name: mysql_db
@@ -13,12 +16,35 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./mysql-init.sql:/docker-entrypoint-initdb.d/1.sql
+    networks:
+      - pfe-network
 
+  # 2. Python
+  ai_service:
+    build:
+      context: ../ai_service
+      dockerfile: Dockerfile
+    container_name: ai_recommendation
+    restart: always
+    ports:
+      - "5005:5005"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=PFE-database
+    depends_on:
+      - db
+    networks:
+      - pfe-network
+
+  # 3. Node.js
   backend:
     build:
       context: ..
       dockerfile: docker/backend.Dockerfile
     container_name: node_backend
+    restart: always
     ports:
       - "5000:5000"
     depends_on:
@@ -34,7 +60,12 @@ services:
       - ../backend-api:/app      
       - /app/node_modules      
       - ../backend-api/uploads:/app/uploads  
-     
+    networks:
+      - pfe-network
+
+networks:
+  pfe-network:
+    driver: bridge
 
 volumes:
   db_data:

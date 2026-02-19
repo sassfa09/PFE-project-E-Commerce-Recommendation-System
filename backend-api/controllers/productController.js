@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// 1. Get All Products
+// 1. Get All Products 
 exports.getAllProducts = async (req, res) => {
     try {
         const query = `
@@ -23,15 +23,18 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-// 2. Create Product
+// 2. Create Product 
 exports.createProduct = async (req, res) => {
     try {
-        const { nom_produit, id_categorie, prix, stock } = req.body;
-        const image_url = req.file ? `uploads/${req.file.filename}` : null;
+       
+        const { nom_produit, id_categorie, prix, stock, description } = req.body;
+        
+      
+        const image_url = req.file ? `uploads/${req.file.filename}` : req.body.image_url;
 
         const [result] = await db.execute(
-            "INSERT INTO product (id_categorie, nom_produit, prix, stock) VALUES (?, ?, ?, ?)",
-            [id_categorie, nom_produit, prix, stock]
+            "INSERT INTO product (id_categorie, nom_produit, prix, stock, description) VALUES (?, ?, ?, ?, ?)",
+            [id_categorie, nom_produit, prix, stock, description]
         );
 
         if (image_url) {
@@ -40,8 +43,9 @@ exports.createProduct = async (req, res) => {
                 [result.insertId, image_url]
             );
         }
-        res.status(201).json({ success: true, message: "Produit créé !" });
+        res.status(201).json({ success: true, message: "Produit créé avec succès !" });
     } catch (error) {
+        console.error("Erreur création:", error.message);
         res.status(500).json({ message: error.message });
     }
 };
@@ -61,22 +65,30 @@ exports.deleteProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nom_produit, id_categorie, prix, stock } = req.body;
+  
+        const { nom_produit, id_categorie, prix, stock, description } = req.body;
 
         await db.execute(
-            "UPDATE product SET nom_produit=?, id_categorie=?, prix=?, stock=? WHERE id_product=?",
-            [nom_produit, id_categorie, prix, stock, id]
+            "UPDATE product SET nom_produit=?, id_categorie=?, prix=?, stock=?, description=? WHERE id_product=?",
+            [nom_produit, id_categorie, prix, stock, description, id]
         );
 
+     
+        let image_url = null;
         if (req.file) {
-            const image_url = `uploads/${req.file.filename}`;
-           
+            image_url = `uploads/${req.file.filename}`;
+        } else if (req.body.image_url) {
+            image_url = req.body.image_url;
+        }
+
+        if (image_url) {
             await db.execute("DELETE FROM Product_Images WHERE prod_ID = ?", [id]);
             await db.execute("INSERT INTO Product_Images (prod_ID, img_url) VALUES (?, ?)", [id, image_url]);
         }
 
-        res.status(200).json({ success: true, message: "Produit modifié !" });
+        res.status(200).json({ success: true, message: "Produit modifié avec succès !" });
     } catch (error) {
+        console.error("Erreur update:", error.message);
         res.status(500).json({ message: error.message });
     }
 };
