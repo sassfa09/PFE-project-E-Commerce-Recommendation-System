@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS client (
     role ENUM('user', 'admin') DEFAULT 'user' 
 );
 
--- 4. Table: product 
+-- 4. Table: product (Updated for Hybrid AI)
 CREATE TABLE IF NOT EXISTS product (
     id_product INT AUTO_INCREMENT PRIMARY KEY,
     id_categorie INT,
@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS product (
     description TEXT, 
     prix DECIMAL(10, 2) NOT NULL,
     stock INT DEFAULT 0,
+    views INT DEFAULT 0,          -- This column has been added to the AI.
+    sales_count INT DEFAULT 0,    -- This column has been added to the AI.
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_product_categorie FOREIGN KEY (id_categorie) 
         REFERENCES categorie(id_categorie) ON DELETE SET NULL

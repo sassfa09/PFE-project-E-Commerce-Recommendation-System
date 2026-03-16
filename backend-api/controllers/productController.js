@@ -26,14 +26,11 @@ exports.getAllProducts = async (req, res) => {
 // 2. Create Product 
 exports.createProduct = async (req, res) => {
     try {
-       
         const { nom_produit, id_categorie, prix, stock, description } = req.body;
-        
-      
         const image_url = req.file ? `uploads/${req.file.filename}` : req.body.image_url;
 
         const [result] = await db.execute(
-            "INSERT INTO product (id_categorie, nom_produit, prix, stock, description) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO product (id_categorie, nom_produit, prix, stock, description, views, sales_count) VALUES (?, ?, ?, ?, ?, 0, 0)",
             [id_categorie, nom_produit, prix, stock, description]
         );
 
@@ -65,7 +62,6 @@ exports.deleteProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-  
         const { nom_produit, id_categorie, prix, stock, description } = req.body;
 
         await db.execute(
@@ -73,7 +69,6 @@ exports.updateProduct = async (req, res) => {
             [nom_produit, id_categorie, prix, stock, description, id]
         );
 
-     
         let image_url = null;
         if (req.file) {
             image_url = `uploads/${req.file.filename}`;
@@ -93,9 +88,25 @@ exports.updateProduct = async (req, res) => {
     }
 };
 
-// 5. Get Product By ID
+// 5. Get Product By ID (Updated for Hybrid AI Tracking)
 exports.getProductById = async (req, res) => {
+    const productId = req.params.id;
+    //userId كيجيك من التوكن إيلا كنتِ دايرة auth middleware
+    const userId = req.user ? req.user.id : null; 
+
     try {
+       // --- A- Updating the number of views (very important for Hybrid Recommendation) ---
+        await db.execute("UPDATE product SET views = views + 1 WHERE id_product = ?", [productId]);
+
+       // --- B- Recording the visit in the history (optional report key) ---
+        if (userId) {
+            await db.execute(
+                "INSERT INTO historique_de_consultation (id_produit, id_utilisateur) VALUES (?, ?)",
+                [productId, userId]
+            );
+        }
+
+      
         const query = `
             SELECT p.*, c.nom_categorie, MAX(pi.img_url) as img_url 
             FROM product p
@@ -104,11 +115,13 @@ exports.getProductById = async (req, res) => {
             WHERE p.id_product = ?
             GROUP BY p.id_product, c.nom_categorie
         `;
-        const [products] = await db.execute(query, [req.params.id]);
+        const [products] = await db.execute(query, [productId]);
         
         if (products.length === 0) return res.status(404).json({ message: "Non trouvé" });
+        
         res.json({ success: true, data: products[0] });
     } catch (error) {
+        console.error("Erreur details:", error.message);
         res.status(500).json({ message: error.message });
     }
 };
@@ -116,7 +129,14 @@ exports.getProductById = async (req, res) => {
 // 6. Get Products By Category
 exports.getProductsByCategory = async (req, res) => {
     try {
-        const [products] = await db.execute("SELECT * FROM product WHERE id_categorie = ?", [req.params.id]);
+        const query = `
+            SELECT p.*, MAX(pi.img_url) as img_url 
+            FROM product p
+            LEFT JOIN Product_Images pi ON p.id_product = pi.prod_ID
+            WHERE p.id_categorie = ?
+            GROUP BY p.id_product
+        `;
+        const [products] = await db.execute(query, [req.params.id]);
         res.json({ success: true, data: products });
     } catch (error) {
         res.status(500).json({ message: error.message });
