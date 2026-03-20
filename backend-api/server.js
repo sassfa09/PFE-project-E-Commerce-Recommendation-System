@@ -6,7 +6,17 @@ const path = require('path');
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(cors()); 
+app.use(cors({
+  origin: [
+    'http://localhost:5173',   // Vite dev server
+    'http://localhost:3000',   // fallback
+    'http://127.0.0.1:5173',
+  ],
+  credentials: true,           // ← allows cookies & Authorization headers
+  methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+}));
+app.options('*', cors());      // ← handles preflight for all routes
 app.use(express.json());
 
 // --- SERVE STATIC FILES  ---
