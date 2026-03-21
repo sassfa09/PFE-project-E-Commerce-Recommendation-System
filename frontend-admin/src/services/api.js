@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api', 
+    baseURL: 'http://localhost:5000/api',
+    withCredentials: true,       
     headers: {
         'Content-Type': 'application/json'
     }
@@ -9,8 +10,7 @@ const API = axios.create({
 
 // 1. Request Interceptor
 API.interceptors.request.use((config) => {
-   
-    const token = localStorage.getItem('adminToken'); 
+    const token = localStorage.getItem('adminToken');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,13 +21,11 @@ API.interceptors.request.use((config) => {
 
 // 2. Response Interceptor
 API.interceptors.response.use(
-    (response) => response, 
+    (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-         
             localStorage.removeItem('adminToken');
-            
-            window.location.href = '/login'; 
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

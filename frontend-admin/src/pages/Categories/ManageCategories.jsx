@@ -10,7 +10,7 @@ const ManageCategories = () => {
   const fetchCategories = async () => {
     try {
       const response = await API.get("/categories");
-      setCategories(response.data);
+     setCategories(response.data.data || response.data);
     } catch (err) {
       console.error("Erreur lors du chargement:", err);
     } finally {
@@ -88,9 +88,12 @@ const ManageCategories = () => {
                     {cat.description || "Pas de description"}
                   </td>
                   <td className="px-8 py-5 text-right space-x-2">
-                    <button className="p-2 text-slate-blue hover:bg-white hover:shadow-md rounded-xl transition-all">
-                      <i className="fa-solid fa-pen-to-square"></i>
-                    </button>
+                    <Link
+                      to={`/dashboard/categories/edit/${cat.id_categorie}`}
+                     className="p-2 text-slate-blue hover:bg-white hover:shadow-md rounded-xl transition-all inline-flex items-center"
+                     >
+                       <i className="fa-solid fa-pen-to-square"></i>
+                    </Link>
                     <button 
                       onClick={() => handleDelete(cat.id_categorie)}
                       className="p-2 text-red-400 hover:bg-red-50 rounded-xl transition-all"

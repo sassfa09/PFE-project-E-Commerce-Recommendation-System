@@ -6,6 +6,7 @@ import ManageProducts from "./pages/Products/ManageProducts";
 import AddProduct from "./pages/Products/AddProduct"; 
 import ManageCategories from "./pages/Categories/ManageCategories";
 import AddCategory from "./pages/Categories/AddCategory";
+import EditCategory from "./pages/Categories/EditCategory";
 import EditProduct from "./pages/Products/EditProduct";
 import OrdersList from "./pages/OrdersList";
 
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/products/edit/:id" element={<EditProduct />} />
                 <Route path="/categories/manage" element={<ManageCategories />} /> 
                 <Route path="/categories/add" element={<AddCategory />} />
+                <Route path="/dashboard/categories/edit/:id" element={<EditCategory />} />
                 <Route path="/orders" element={<OrdersList />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </Routes>
