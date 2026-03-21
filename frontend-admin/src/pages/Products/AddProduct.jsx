@@ -19,7 +19,7 @@ const AddProduct = () => {
     const fetchCats = async () => {
       try {
         const res = await API.get("/categories");
-        setCategories(res.data);
+        setCategories(res.data.data || res.data);
       } catch (err) {
         console.error("Erreur lors du chargement des catégories:", err);
       }
