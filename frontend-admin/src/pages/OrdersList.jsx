@@ -174,8 +174,16 @@ const OrdersList = () => {
                 <div className="space-y-4">
                   {selectedItems.map((item, index) => (
                     <div key={index} className="flex items-center gap-5 p-4 rounded-2xl border border-platinum hover:border-pacific/30 transition-all">
+                       <p>{ console.log(item.img_url)}</p>
+                       
                       <img 
-                        src={item.img_url ? (item.img_url.startsWith('http') ? item.img_url : `http://localhost:5000/${item.img_url}`) : 'https://via.placeholder.com/150'} 
+                        src={
+                        !item.img_url
+                        ? `https://placehold.co/80x80?text=No+Image`
+                        : item.img_url.startsWith('http')
+                        ? item.img_url
+                        : `http://localhost:5000/${item.img_url.startsWith('/') ? item.img_url.slice(1) : item.img_url}`
+}
                         className="w-20 h-20 object-cover rounded-2xl border border-platinum shadow-sm" 
                         alt={item.nom_produit}
                       />

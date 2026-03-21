@@ -137,7 +137,16 @@ exports.getOrderDetails = async (req, res) => {
     try {
         const { id } = req.params;
         const [items] = await db.query(`
-            SELECT lc.*, p.nom_produit 
+            SELECT 
+                lc.quantite,
+                lc.prix_unitaire,
+                p.nom_produit,
+                (
+                    SELECT pi.img_url 
+                    FROM Product_Images pi 
+                    WHERE pi.prod_ID = p.id_product 
+                    LIMIT 1
+                ) AS img_url
             FROM Ligne_Commande lc
             JOIN product p ON lc.id_produit = p.id_product
             WHERE lc.id_commande = ?
