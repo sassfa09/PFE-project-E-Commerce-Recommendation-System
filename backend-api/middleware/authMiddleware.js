@@ -59,3 +59,21 @@ exports.adminMiddleware = (req, res, next) => {
     // If everything is fine, proceed to the controller
     next();
 };
+/**
+ * Optional auth — identifies user if token present, continues anonymously if not
+ * Use for public routes that benefit from knowing who the user is (e.g. product views tracking)
+ */
+exports.optionalAuth = (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) return next(); // no token — anonymous user, continue normally
+
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        req.user = decoded;
+    } catch (err) {
+        // invalid or expired token — treat as anonymous, don't block
+    }
+    next();
+};

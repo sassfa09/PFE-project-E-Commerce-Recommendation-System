@@ -91,9 +91,7 @@ exports.updateProduct = async (req, res) => {
 // 5. Get Product By ID (Updated for Hybrid AI Tracking)
 exports.getProductById = async (req, res) => {
     const productId = req.params.id;
-    //userId كيجيك من التوكن إيلا كنتِ دايرة auth middleware
-    const userId = req.user ? req.user.id : null; 
-
+    const userId = req.user ? req.user.id_user : null;
     try {
        // --- A- Updating the number of views (very important for Hybrid Recommendation) ---
         await db.execute("UPDATE product SET views = views + 1 WHERE id_product = ?", [productId]);
